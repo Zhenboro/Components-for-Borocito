@@ -7,16 +7,16 @@ Namespace Boro_Comm
 
         Dim tcpClient As TCPCliente
         Sub ConnectToServer()
-            TcpClient = New TCPCliente()
+            tcpClient = New TCPCliente()
             ' Conectar al servidor
-            TcpClient.ConnectToServer()
+            tcpClient.ConnectToServer()
         End Sub
         Function SendMesssage(message As String) As String
             Try
                 'TODO: permitir reconectarse al servidor para enviar.
                 If tcpClient IsNot Nothing AndAlso message IsNot Nothing Then
                     tcpClient.SendMesssage("¡#" & message)
-                    Console.WriteLine("Mensaje enviado: " & message)
+                    AddToLog("TCPCliente", "Broadcast message: " & message)
                 End If
                 Return message
             Catch ex As Exception
@@ -30,7 +30,7 @@ Namespace Boro_Comm
             Private thread As Thread
             Private isConnected As Boolean
             Private serverIp As String = "127.0.0.1"
-            Private serverPort As Integer = 13121
+            Private serverPort As Integer = 13120
 
             Public Event MessageReceived As EventHandler(Of String)
 
@@ -45,12 +45,12 @@ Namespace Boro_Comm
                     client.Connect(serverIp, serverPort)
                     clientStream = client.GetStream()
                     isConnected = True
-                    Console.WriteLine("Conectado al servidor.")
                     ' Iniciar hilo para leer los mensajes del servidor
                     thread = New Thread(AddressOf ReadMessages)
                     thread.Start()
+                    AddToLog("ConnectToServer@TCPCliente", "Conectado al servidor!")
                 Catch ex As Exception
-                    Console.WriteLine("Error conectando al servidor: " & ex.Message)
+                    AddToLog("ConnectToServer@TCPCliente", "Error: " & ex.Message)
                 End Try
             End Sub
 
@@ -60,9 +60,9 @@ Namespace Boro_Comm
                     isConnected = False
                     clientStream.Close()
                     client.Close()
-                    Console.WriteLine("Desconectado del servidor.")
+                    AddToLog("DisconnectFromServer@TCPCliente", "Desconectado del servidor.")
                 Catch ex As Exception
-                    Console.WriteLine("Error desconectando: " & ex.Message)
+                    AddToLog("DisconnectFromServer@TCPCliente", "Error: " & ex.Message)
                 End Try
             End Sub
 
@@ -72,9 +72,8 @@ Namespace Boro_Comm
                     Try
                         Dim data As Byte() = Encoding.UTF8.GetBytes(message)
                         clientStream.Write(data, 0, data.Length)
-                        Console.WriteLine("Mensaje enviado: " & message)
                     Catch ex As Exception
-                        Console.WriteLine("Error enviando mensaje: " & ex.Message)
+                        AddToLog("SendMesssage@TCPCliente", "Error: " & ex.Message)
                     End Try
                 End If
             End Sub
@@ -93,7 +92,7 @@ Namespace Boro_Comm
                         End If
                         Thread.Sleep(100)
                     Catch ex As Exception
-                        Console.WriteLine("Error leyendo mensaje: " & ex.Message)
+                        AddToLog("ReadMessages@TCPCliente", "Error: " & ex.Message)
                         Exit While
                     End Try
                 End While

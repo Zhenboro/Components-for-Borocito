@@ -5,7 +5,6 @@ Public Class Init
         Me.Hide()
         parameters = Command()
         StartUp.Init()
-        ConnectToServer()
         ReadParameters(parameters)
     End Sub
     Sub ReadParameters(ByVal parametros As String)

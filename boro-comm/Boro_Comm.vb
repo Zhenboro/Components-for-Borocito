@@ -274,6 +274,7 @@ Namespace Boro_Comm
             Private serverPort As Integer
 
             Public Event MessageReceived As EventHandler(Of String)
+            Public Event ErrorOccurred(exception As Exception) 'TODO: implementar (el CLI puede reiniciarse)
 
             Public Sub New(Optional host As String = "127.0.0.1", Optional port As Integer = 13120)
                 client = New TcpClient()
