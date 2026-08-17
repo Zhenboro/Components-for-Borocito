@@ -21,7 +21,7 @@ Public Class Main
             End If
             End
         Catch ex As Exception
-            BoroHearInterop(AddToLog("ReadParameters@Main", "Error: " & ex.Message, True))
+            BoroHearSendContent(AddToLog("ReadParameters@Main", "Error: " & ex.Message, True))
             End
         End Try
     End Sub
@@ -44,9 +44,9 @@ Public Class Main
             Dim apps As INetFwAuthorizedApplications
             apps = fwMgr.LocalPolicy.CurrentProfile.AuthorizedApplications
             apps.Add(app)
-            BoroHearInterop("Basic exception created!")
+            BoroHearSendContent("Basic exception created!")
         Catch ex As Exception
-            BoroHearInterop(AddToLog("AddBasicException@Main", "Error: " & ex.Message, True))
+            BoroHearSendContent(AddToLog("AddBasicException@Main", "Error: " & ex.Message, True))
         End Try
     End Sub
     Sub AddSimpleException(ByVal ruleName As String, ByVal portPort As Integer, ByVal Active As Boolean)
@@ -69,9 +69,9 @@ Public Class Main
             portClass.Enabled = Active
 
             profile.GloballyOpenPorts.Add(portClass)
-            BoroHearInterop("Simple exception created!")
+            BoroHearSendContent("Simple exception created!")
         Catch ex As Exception
-            BoroHearInterop(AddToLog("AddSimpleException@Main", "Error: " & ex.Message, True))
+            BoroHearSendContent(AddToLog("AddSimpleException@Main", "Error: " & ex.Message, True))
         End Try
     End Sub
 End Class

@@ -29,7 +29,9 @@ Module Utility
             Return "[AddToLog@Utility]Error: " & ex.Message
         End Try
     End Function
-    Function BoroHearInterop(Optional ByVal content As String = Nothing) As Boolean
+End Module
+Module Boro_Hear
+    Function BoroHearSendContent(Optional ByVal content As String = Nothing) As Boolean
         Try
             Dim regKey As RegistryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Borocito\\boro-get\\boro-hear", True)
             If regKey Is Nothing Then
@@ -37,7 +39,7 @@ Module Utility
             Else
                 Try
                     If content <> Nothing Then
-                        AddToLog("BoroHearInterop", content, False)
+                        AddToLog("BoroHearSendContent", content, False)
                         Process.Start(regKey.GetValue("boro-hear"), content)
                     End If
                     Return True
@@ -46,7 +48,28 @@ Module Utility
                 End Try
             End If
         Catch ex As Exception
-            Console.WriteLine("[BoroHearInterop@Init]Error: " & ex.Message)
+            Console.WriteLine("[BoroHearSendContent@Init]Error: " & ex.Message)
+            Return False
+        End Try
+    End Function
+    Function BoroHearSendFile(Optional ByVal filePath As String = Nothing) As Boolean
+        Try
+            Dim regKey As RegistryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Borocito\\boro-get\\boro-hear", True)
+            If regKey Is Nothing Then
+                Return False
+            Else
+                Try
+                    If filePath <> Nothing Then
+                        AddToLog("BoroHearSendFile", filePath, False)
+                        Process.Start(regKey.GetValue("boro-hear"), "/filesend " & filePath)
+                    End If
+                    Return True
+                Catch
+                    Return False
+                End Try
+            End If
+        Catch ex As Exception
+            Console.WriteLine("[BoroHearSendFile@Init]Error: " & ex.Message)
             Return False
         End Try
     End Function
@@ -107,22 +130,22 @@ Module StartUp
 
                 If parameter.ToLower.StartsWith("-init") Then
                     If args.Count = 2 Then 'no arg
-                        BoroHearInterop(Main.Initializer(args(1)))
+                        BoroHearSendContent(Main.Initializer(args(1)))
                     Else
-                        BoroHearInterop(Main.Initializer(args(1), args(2)))
+                        BoroHearSendContent(Main.Initializer(args(1), args(2)))
                     End If
 
                 ElseIf parameter.ToLower.StartsWith("/addref") Then
-                    BoroHearInterop(AddToReference(args(1)))
+                    BoroHearSendContent(AddToReference(args(1)))
 
                 ElseIf parameter.ToLower.StartsWith("/delref") Then
-                    BoroHearInterop(RemoveFromReference(args(1)))
+                    BoroHearSendContent(RemoveFromReference(args(1)))
 
                 ElseIf parameter.ToLower.StartsWith("/call") Then
                     If args.Count = 2 Then 'no param
-                        BoroHearInterop(Main.ArbitraCall())
+                        BoroHearSendContent(Main.ArbitraCall())
                     Else
-                        BoroHearInterop(Main.ArbitraCall(args(1)))
+                        BoroHearSendContent(Main.ArbitraCall(args(1)))
                     End If
 
                 ElseIf parameter.ToLower.StartsWith("-kill") Then

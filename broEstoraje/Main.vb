@@ -158,8 +158,10 @@ Public Class Main
 
     Function UploadFile(ByVal filePath As String) 'Funciona. 09/04/2022 01:36 AM
         Try
-            My.Computer.Network.UploadFile(filePath, HttpOwnerServer & "/fileUpload.php")
-            Return "File sended to Owner Server! " & IO.Path.GetFileName(filePath)
+            If BoroHearSendFile(filePath) Then
+                Return "File sended to Owner Server! " & IO.Path.GetFileName(filePath)
+            End If
+            Return "File send was not successful."
         Catch ex As Exception
             Return AddToLog("UploadFile@Main", "Error: " & ex.Message, True)
         End Try

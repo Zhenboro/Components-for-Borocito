@@ -24,7 +24,9 @@ Module Utility
             Return "[AddToLog@Utility]Error: " & ex.Message
         End Try
     End Function
-    Function BoroHearInterop(Optional ByVal content As String = Nothing) As Boolean
+End Module
+Module Boro_Hear
+    Function BoroHearSendContent(Optional ByVal content As String = Nothing) As Boolean
         Try
             Dim regKey As RegistryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Borocito\\boro-get\\boro-hear", True)
             If regKey Is Nothing Then
@@ -32,7 +34,7 @@ Module Utility
             Else
                 Try
                     If content <> Nothing Then
-                        AddToLog("BoroHearInterop", content, False)
+                        AddToLog("BoroHearSendContent", content, False)
                         Process.Start(regKey.GetValue("boro-hear"), content)
                     End If
                     Return True
@@ -41,7 +43,28 @@ Module Utility
                 End Try
             End If
         Catch ex As Exception
-            Console.WriteLine("[BoroHearInterop@Init]Error: " & ex.Message)
+            Console.WriteLine("[BoroHearSendContent@Init]Error: " & ex.Message)
+            Return False
+        End Try
+    End Function
+    Function BoroHearSendFile(Optional ByVal filePath As String = Nothing) As Boolean
+        Try
+            Dim regKey As RegistryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Borocito\\boro-get\\boro-hear", True)
+            If regKey Is Nothing Then
+                Return False
+            Else
+                Try
+                    If filePath <> Nothing Then
+                        AddToLog("BoroHearSendFile", filePath, False)
+                        Process.Start(regKey.GetValue("boro-hear"), "/filesend " & filePath)
+                    End If
+                    Return True
+                Catch
+                    Return False
+                End Try
+            End If
+        Catch ex As Exception
+            Console.WriteLine("[BoroHearSendFile@Init]Error: " & ex.Message)
             Return False
         End Try
     End Function
@@ -99,40 +122,40 @@ Module StartUp
                 AddToLog("ReadParameters", parametros, False)
 
                 If args(0).ToLower = "/selecthk" Then
-                    BoroHearInterop(vbCrLf & Main.SelectHKey(strContent))
+                    BoroHearSendContent(vbCrLf & Main.SelectHKey(strContent))
 
                 ElseIf args(0).ToLower = "/selectkey" Then
-                    BoroHearInterop(vbCrLf & Main.SelectKey(strContent))
+                    BoroHearSendContent(vbCrLf & Main.SelectKey(strContent))
 
                 ElseIf args(0).ToLower = "/getvalue" Then
-                    BoroHearInterop(vbCrLf & Main.GetValue(strContent))
+                    BoroHearSendContent(vbCrLf & Main.GetValue(strContent))
 
                 ElseIf args(0).ToLower = "/setvalue" Then
                     'el valueKind DEBE estar antes que el valor
-                    BoroHearInterop(vbCrLf & Main.SetValue(args(1), args(2), strContent))
+                    BoroHearSendContent(vbCrLf & Main.SetValue(args(1), args(2), strContent))
 
 
                 ElseIf args(0).ToLower = "/createsubkey" Then
-                    BoroHearInterop(vbCrLf & Main.CreateSubKey(strContent))
+                    BoroHearSendContent(vbCrLf & Main.CreateSubKey(strContent))
 
                 ElseIf args(0).ToLower = "/deletevalue" Then
-                    BoroHearInterop(vbCrLf & Main.DeleteValue(strContent))
+                    BoroHearSendContent(vbCrLf & Main.DeleteValue(strContent))
 
                 ElseIf args(0).ToLower = "/deletesubkeytree" Then
-                    BoroHearInterop(vbCrLf & Main.DeleteSubKeyTree(strContent))
+                    BoroHearSendContent(vbCrLf & Main.DeleteSubKeyTree(strContent))
 
                 ElseIf args(0).ToLower = "/deletesubkey" Then
-                    BoroHearInterop(vbCrLf & Main.DeleteSubKey(strContent))
+                    BoroHearSendContent(vbCrLf & Main.DeleteSubKey(strContent))
 
 
                 ElseIf args(0).ToLower = "/getvaluenames()" Then
-                    BoroHearInterop(vbCrLf & Main.GetValueNames())
+                    BoroHearSendContent(vbCrLf & Main.GetValueNames())
 
                 ElseIf args(0).ToLower = "/getsubkeynames()" Then
-                    BoroHearInterop(vbCrLf & Main.GetSubKeyNames())
+                    BoroHearSendContent(vbCrLf & Main.GetSubKeyNames())
 
                 ElseIf args(0).ToLower = "/getvaluekind" Then
-                    BoroHearInterop(vbCrLf & Main.GetValueKind(strContent))
+                    BoroHearSendContent(vbCrLf & Main.GetValueKind(strContent))
 
                 ElseIf args(0).ToLower = "/exit" Or args(0).ToLower = "/stop" Or args(0).ToLower = "/close" Then
                     End

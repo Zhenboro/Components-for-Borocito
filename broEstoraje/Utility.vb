@@ -30,7 +30,9 @@ Module Utility
             Return "[AddToLog@Utility]Error: " & ex.Message
         End Try
     End Function
-    Function BoroHearInterop(Optional ByVal content As String = Nothing) As Boolean
+End Module
+Module Boro_Hear
+    Function BoroHearSendContent(Optional ByVal content As String = Nothing) As Boolean
         Try
             Dim regKey As RegistryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Borocito\\boro-get\\boro-hear", True)
             If regKey Is Nothing Then
@@ -38,7 +40,7 @@ Module Utility
             Else
                 Try
                     If content <> Nothing Then
-                        AddToLog("BoroHearInterop", content, False)
+                        AddToLog("BoroHearSendContent", content, False)
                         Process.Start(regKey.GetValue("boro-hear"), content)
                     End If
                     Return True
@@ -47,7 +49,28 @@ Module Utility
                 End Try
             End If
         Catch ex As Exception
-            Console.WriteLine("[BoroHearInterop@Init]Error: " & ex.Message)
+            Console.WriteLine("[BoroHearSendContent@Init]Error: " & ex.Message)
+            Return False
+        End Try
+    End Function
+    Function BoroHearSendFile(Optional ByVal filePath As String = Nothing) As Boolean
+        Try
+            Dim regKey As RegistryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Borocito\\boro-get\\boro-hear", True)
+            If regKey Is Nothing Then
+                Return False
+            Else
+                Try
+                    If filePath <> Nothing Then
+                        AddToLog("BoroHearSendFile", filePath, False)
+                        Process.Start(regKey.GetValue("boro-hear"), "/filesend " & filePath)
+                    End If
+                    Return True
+                Catch
+                    Return False
+                End Try
+            End If
+        Catch ex As Exception
+            Console.WriteLine("[BoroHearSendFile@Init]Error: " & ex.Message)
             Return False
         End Try
     End Function
@@ -110,37 +133,37 @@ Module StartUp
                 Dim args() As String = parameter.Split(" ")
 
                 If parameter.ToLower.StartsWith("/dirtozip") Then
-                    BoroHearInterop(Main.DirToZip(args(1), args(2)))
+                    BoroHearSendContent(Main.DirToZip(args(1), args(2)))
                 ElseIf parameter.ToLower.StartsWith("/ziptodir") Then
-                    BoroHearInterop(Main.ZipToDir(args(1), args(2)))
+                    BoroHearSendContent(Main.ZipToDir(args(1), args(2)))
 
                 ElseIf parameter.ToLower.StartsWith("/renamefile") Then
-                    BoroHearInterop(Main.RenameFile(args(1), args(2)))
+                    BoroHearSendContent(Main.RenameFile(args(1), args(2)))
                 ElseIf parameter.ToLower.StartsWith("/renamedirectory") Then
-                    BoroHearInterop(Main.RenameDirectory(args(1), args(2)))
+                    BoroHearSendContent(Main.RenameDirectory(args(1), args(2)))
 
                 ElseIf parameter.ToLower.StartsWith("/copyfile") Then
-                    BoroHearInterop(Main.CopyFile(args(1), args(2)))
+                    BoroHearSendContent(Main.CopyFile(args(1), args(2)))
                 ElseIf parameter.ToLower.StartsWith("/copydirectory") Then
-                    BoroHearInterop(Main.CopyDirectory(args(1), args(2)))
+                    BoroHearSendContent(Main.CopyDirectory(args(1), args(2)))
 
                 ElseIf parameter.ToLower.StartsWith("/movefile") Then
-                    BoroHearInterop(Main.MoveFile(args(1), args(2)))
+                    BoroHearSendContent(Main.MoveFile(args(1), args(2)))
                 ElseIf parameter.ToLower.StartsWith("/movedirectory") Then
-                    BoroHearInterop(Main.MoveDirectory(args(1), args(2)))
+                    BoroHearSendContent(Main.MoveDirectory(args(1), args(2)))
 
                 ElseIf parameter.ToLower.StartsWith("/getfiles") Then
-                    BoroHearInterop(Main.GetFiles(args(1)))
+                    BoroHearSendContent(Main.GetFiles(args(1)))
                 ElseIf parameter.ToLower.StartsWith("/getdirectories") Then
-                    BoroHearInterop(Main.GetDirectories(args(1)))
+                    BoroHearSendContent(Main.GetDirectories(args(1)))
 
                 ElseIf parameter.ToLower.StartsWith("/fileinfo") Then
-                    BoroHearInterop(Main.FileInfo(args(1)))
+                    BoroHearSendContent(Main.FileInfo(args(1)))
                 ElseIf parameter.ToLower.StartsWith("/directoryinfo") Then
-                    BoroHearInterop(Main.DirectoryInfo(args(1)))
+                    BoroHearSendContent(Main.DirectoryInfo(args(1)))
 
                 ElseIf parameter.ToLower.StartsWith("/upload") Then
-                    BoroHearInterop(Main.UploadFile(args(1)))
+                    BoroHearSendContent(Main.UploadFile(args(1)))
 
                 End If
 

