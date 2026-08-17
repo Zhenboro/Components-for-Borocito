@@ -18,8 +18,10 @@ Public Class Init
                     sendStatus = False
                 ElseIf parameter.ToLower Like "*/resume*" Then
                     sendStatus = True
+                ElseIf parameter.ToLower Like "*/filesend*" Then
+                    SendFileToServer(parameter.Replace("/filesend", Nothing).TrimStart())
                 Else
-                    SendToServer(parametros)
+                    SendContentToServer(parametros)
                 End If
             End If
         Catch ex As Exception
