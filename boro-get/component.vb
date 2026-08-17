@@ -146,8 +146,6 @@ Namespace Boro_Get
                 regKey.SetValue("Version", GetIniValue("ASSEMBLY", "Version", DIRPacketRepo))
                 regKey.SetValue("Web", GetIniValue("ASSEMBLY", "Web", DIRPacketRepo))
                 regKey.SetValue("Binaries", GetIniValue("INSTALLER", "Binaries", DIRPacketRepo))
-                regKey.SetValue("Installer", GetIniValue("INSTALLER", "Installer", DIRPacketRepo))
-                regKey.SetValue("InstallFolder", GetIniValue("INSTALLER", "InstallFolder", DIRPacketRepo))
             Catch ex As Exception
                 AddToLog("RegisterInstall@PacketAdministrator", "Error: " & ex.Message, True)
             End Try
