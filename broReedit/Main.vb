@@ -1,4 +1,5 @@
-﻿Imports Microsoft.Win32
+﻿Imports System.Text.RegularExpressions
+Imports Microsoft.Win32
 Public Class Main
 
     Private Sub Main_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -27,7 +28,7 @@ Public Class Main
     Dim currentHiveKeyReg As RegistryKey
     Dim currentKey As String
 
-    Function SelectHKey(ByVal hiveKey As String) As String 'Funciona 24/04 14:37
+    Function SelectHKey(ByVal hiveKey As String) As String
         Try
             currentHiveKey = hiveKey
             Select Case hiveKey
@@ -51,7 +52,7 @@ Public Class Main
             Return AddToLog("SelectHKey@RegistryEditor", "Error: " & ex.Message, True)
         End Try
     End Function
-    Function SelectKey(ByVal nameKey As String) As String 'Funciona 24/04 14:38
+    Function SelectKey(ByVal nameKey As String) As String
         Try
             currentKey = nameKey
             currentHiveKeyReg = Registry.CurrentUser.OpenSubKey(nameKey, True)
@@ -61,16 +62,16 @@ Public Class Main
         End Try
     End Function
 
-    Function GetValue(ByVal valueName As String) As String 'Funciona 24/04 14:39
+    Function GetValue(ByVal valueName As String) As String
         Try
             Return currentHiveKeyReg.GetValue(valueName)
         Catch ex As Exception
             Return AddToLog("GetValue@RegistryEditor", "Error: " & ex.Message, True)
         End Try
     End Function
-    Function SetValue(ByVal valueName As String, ByVal value As String, Optional ByVal valueKind As String = Nothing) As String  'Funciona 24/04 14:44
+    Function SetValue(ByVal valueName As String, ByVal valueKind As String, ByVal value As String) As String
         Try
-            If valueKind = Nothing Or valueKind.ToLower = "null" Then
+            If valueKind = Nothing Or valueKind.ToLower = "null" Or Not Regex.IsMatch(valueKind, "^[0-9 ]+$") Then
                 valueKind = 1
             End If
             currentHiveKeyReg.SetValue(valueName, value, valueKind)
@@ -79,7 +80,7 @@ Public Class Main
             Return AddToLog("SetValue@RegistryEditor", "Error: " & ex.Message, True)
         End Try
     End Function
-    Function DeleteValue(ByVal valueName As String) As String 'Funciona 24/04 14:56
+    Function DeleteValue(ByVal valueName As String) As String
         Try
             currentHiveKeyReg.DeleteValue(valueName)
             Return "Deleted! " & valueName
@@ -88,7 +89,7 @@ Public Class Main
         End Try
     End Function
 
-    Function CreateSubKey(ByVal subKey As String) As String 'Funciona 24/04 15:04
+    Function CreateSubKey(ByVal subKey As String) As String
         Try
             currentHiveKeyReg.CreateSubKey(subKey, True)
             Return "Key created! " & subKey
@@ -96,7 +97,7 @@ Public Class Main
             Return AddToLog("CreateSubKey@RegistryEditor", "Error: " & ex.Message, True)
         End Try
     End Function
-    Function DeleteSubKey(ByVal subKey As String) As String 'Funciona 24/04 15:11
+    Function DeleteSubKey(ByVal subKey As String) As String
         Try
             currentHiveKeyReg.DeleteSubKey(subKey)
             Return "Key deleted! " & subKey
@@ -104,7 +105,7 @@ Public Class Main
             Return AddToLog("DeleteSubKey@RegistryEditor", "Error: " & ex.Message, True)
         End Try
     End Function
-    Function DeleteSubKeyTree(ByVal subKey As String) As String 'Funciona 24/04 15:12
+    Function DeleteSubKeyTree(ByVal subKey As String) As String
         Try
             currentHiveKeyReg.DeleteSubKeyTree(subKey)
             Return "Key tree deleted! " & subKey
@@ -113,7 +114,7 @@ Public Class Main
         End Try
     End Function
 
-    Function GetValueNames() As String  'Funciona 24/04 15:44
+    Function GetValueNames() As String
         Try
             Dim contenido As String = Nothing
             For Each item As String In currentHiveKeyReg.GetValueNames()
@@ -124,7 +125,7 @@ Public Class Main
             Return AddToLog("GetValueNames@RegistryEditor", "Error: " & ex.Message, True)
         End Try
     End Function
-    Function GetSubKeyNames() As String 'Funciona 24/04 15:45
+    Function GetSubKeyNames() As String
         Try
             Dim contenido As String = Nothing
             For Each item As String In currentHiveKeyReg.GetSubKeyNames()
@@ -135,7 +136,7 @@ Public Class Main
             Return AddToLog("GetSubKeyNames@RegistryEditor", "Error: " & ex.Message, True)
         End Try
     End Function
-    Function GetValueKind(ByVal valueName As String) As String 'Funciona 24/04 15:46
+    Function GetValueKind(ByVal valueName As String) As String
         Try
             Return currentHiveKeyReg.GetValueKind(valueName)
         Catch ex As Exception

@@ -96,6 +96,8 @@ Module StartUp
                     strContent = parametros.Substring(strI + 1, parametros.IndexOf("'", strI + 1) - strI - 1)
                 End If
 
+                AddToLog("ReadParameters", parametros, False)
+
                 If args(0).ToLower = "/selecthk" Then
                     BoroHearInterop(vbCrLf & Main.SelectHKey(strContent))
 
@@ -107,7 +109,7 @@ Module StartUp
 
                 ElseIf args(0).ToLower = "/setvalue" Then
                     'el valueKind DEBE estar antes que el valor
-                    BoroHearInterop(vbCrLf & Main.SetValue(args(1), strContent, args(3)))
+                    BoroHearInterop(vbCrLf & Main.SetValue(args(1), args(2), strContent))
 
 
                 ElseIf args(0).ToLower = "/createsubkey" Then
