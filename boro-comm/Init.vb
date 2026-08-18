@@ -94,7 +94,7 @@ Public Class Init
     End Sub
     Private Sub WebSocket_MessageReceived(message As ServerMessage)
         Try
-            If Not message.Command Then
+            If message.Command Is Nothing Then
                 Return
             End If
 
