@@ -94,6 +94,10 @@ Public Class Init
     End Sub
     Private Sub WebSocket_MessageReceived(message As ServerMessage)
         Try
+            If Not message.Command Then
+                Return
+            End If
+
             AddToLog("Servidor > Borocito", message.Command)
             tcpBorocito.SendMesssage(message.Command)
         Catch ex As Exception

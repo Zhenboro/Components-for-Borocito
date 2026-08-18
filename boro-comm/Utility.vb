@@ -49,10 +49,14 @@ Module Memory
         Try
             Dim llaveReg As String = "SOFTWARE\\Borocito\\boro-get\\" & My.Application.Info.AssemblyName
             Dim registerKey As RegistryKey = Registry.CurrentUser.OpenSubKey(llaveReg, True)
-            If registerKey IsNot Nothing Then
-                registerKey.CreateSubKey(llaveReg)
-                registerKey.SetValue("Version", My.Application.Info.Version.ToString & " (" & Application.ProductVersion & ")")
+            If registerKey Is Nothing Then
+                Registry.CurrentUser.CreateSubKey(llaveReg)
+                registerKey = Registry.CurrentUser.OpenSubKey(llaveReg, True)
             End If
+            registerKey.SetValue(My.Application.Info.AssemblyName, System.Windows.Forms.Application.StartupPath & My.Application.Info.AssemblyName & ".exe")
+            registerKey.SetValue("Executable", My.Application.Info.AssemblyName & ".exe")
+            registerKey.SetValue("Name", My.Application.Info.AssemblyName)
+            registerKey.SetValue("Version", My.Application.Info.Version.ToString & " (" & Application.ProductVersion & ")")
         Catch ex As Exception
             AddToLog("RegisterInstance@Memory", "Error: " & ex.Message, True)
         End Try
@@ -82,7 +86,7 @@ Module StartUp
     End Sub
     Sub ReadParameters(ByVal parametros As String)
         Try
-            If parametros.Contains(" ") Then
+            If parametros <> Nothing And parametros.Contains(" ") Then
                 Dim args As String() = parametros.Split(" ")
                 If args(0).ToLower = "ws" Then
                     Dim server = args(1).Trim() 'localhost
@@ -93,7 +97,6 @@ Module StartUp
             End If
         Catch ex As Exception
             AddToLog("ReadParameters@StartUp", "Error: " & ex.Message, True)
-            End
         End Try
     End Sub
 End Module

@@ -25,7 +25,7 @@ Namespace My
 
     Partial Friend Class MyApplication
         Private Sub MyApplication_StartupNextInstance(sender As Object, e As StartupNextInstanceEventArgs) Handles Me.StartupNextInstance
-            Dim contenido As String = Nothing
+            Dim contenido As String = ""
             For Each item As String In e.CommandLine
                 contenido &= item & " "
             Next
