@@ -98,6 +98,11 @@ Public Class Init
                 Return
             End If
 
+            If message.Command.Trim().StartsWith("!boro-comm") Then 'sanity check
+                WebSocket_MessageSend("boro-comm at boro-get")
+                Threading.Thread.Sleep(500)
+            End If
+
             AddToLog("Servidor > Borocito", message.Command)
             tcpBorocito.SendMesssage(message.Command)
         Catch ex As Exception
