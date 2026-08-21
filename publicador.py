@@ -91,7 +91,7 @@ InstallFolder=%temp%
                 json_content = {
                     "name": assembly_product,
                     "description": "",
-                    "executable": assembly_product,
+                    "executable": str(f"{assembly_product}.exe"),
                     "version": assembly_version,
                     "docs": f"https://github.com/Borocito/Components-for-Borocito/tree/main/{assembly_product}",
                     "binaries": str(f"{SERVIDOR}/Boro-Get/REPO/{assembly_product}.zip") if not USAR_GITHUB else str(f"https://github.com/Borocito/Components-for-Borocito/releases/latest/download/{assembly_product}.zip"),
