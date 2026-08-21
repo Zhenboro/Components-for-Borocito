@@ -84,7 +84,7 @@ Version={assembly_version}
 Web=https://github.com/Borocito/Components-for-Borocito/tree/main/{assembly_product}
 
 [INSTALLER]
-Binaries={str(f"{SERVIDOR}/Boro-Get/REPO/{assembly_product}.zip") if not USAR_GITHUB else str(f"https://github.com/Borocito/Components-for-Borocito/releases/download/latest/{assembly_product}.zip")}
+Binaries={str(f"{SERVIDOR}/Boro-Get/REPO/{assembly_product}.zip") if not USAR_GITHUB else str(f"https://github.com/Borocito/Components-for-Borocito/releases/latest/download/{assembly_product}.zip")}
 Installer=NULL
 InstallFolder=%temp%
                 """
@@ -94,7 +94,7 @@ InstallFolder=%temp%
                     "executable": assembly_product,
                     "version": assembly_version,
                     "docs": f"https://github.com/Borocito/Components-for-Borocito/tree/main/{assembly_product}",
-                    "binaries": str(f"{SERVIDOR}/Boro-Get/REPO/{assembly_product}.zip") if not USAR_GITHUB else str(f"https://github.com/Borocito/Components-for-Borocito/releases/download/latest/{assembly_product}.zip"),
+                    "binaries": str(f"{SERVIDOR}/Boro-Get/REPO/{assembly_product}.zip") if not USAR_GITHUB else str(f"https://github.com/Borocito/Components-for-Borocito/releases/latest/download/{assembly_product}.zip"),
                     "author": assembly_company,
                     "website": f"http://github.com/{assembly_company}"
                 }
